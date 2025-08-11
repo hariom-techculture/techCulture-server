@@ -9,6 +9,9 @@ const router = express.Router();
 const upload = multer({ dest: "uploads/" });
 
 router.get("/", getSiteSetting);
-router.put("/", upload.single("file"), updateSiteSetting);
+router.put("/", upload.fields([
+    { name: "logo", maxCount: 1 },
+    { name: "clients", maxCount: 10 } // adjust maxCount as needed
+  ]), updateSiteSetting);
 
 export default router;

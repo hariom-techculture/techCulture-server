@@ -4,6 +4,7 @@ import fs from 'fs';
 import { v2 as cloudinary} from "cloudinary";
 import path, { format } from "path";
 import url from "url";
+import { v4 as uuidv4 } from 'uuid'; 
 
 // Configure Cloudinary
 cloudinary.config({
@@ -29,9 +30,10 @@ const uploadToCloudinary = async (files, folder = 'default') => {
     const uploads = await Promise.all(
       files.map(async (file) => {
         const ext = path.extname(file.originalname).toLowerCase();
-        const resourceType = ext === '.pdf' ? 'raw' : 'image';
+        const resourceType = ext === '.pdf' ? 'raw' : (ext === '.mp4' ? 'video' : 'image');
         const rawName = path.parse(file.originalname).name;
-        const publicId = sanitizeFileName(rawName);
+        let publicId = sanitizeFileName(rawName);
+        publicId += `-${uuidv4()}`;
 
         const cloudinaryOptions = {
         folder ,
@@ -44,7 +46,6 @@ const uploadToCloudinary = async (files, folder = 'default') => {
 
       const result = await cloudinary.uploader.upload(file.path ,cloudinaryOptions);
       fs.unlinkSync(file.path);
-      console.log("result ", result);
       return result;
     }))
 
@@ -72,7 +73,7 @@ const extractPublicId = (fileUrl) => {
     const publicId = publicIdWithExt.replace(ext, '');
 
     // Infer resource type from extension
-    const resourceType = ext === '.pdf' ? 'raw' : 'image';
+    const resourceType = ext === '.pdf' ? 'raw' : (ext === '.mp4' ? 'video' : 'image');
 
     return { publicId, resourceType };
   } catch (err) {
@@ -89,6 +90,7 @@ const deleteFromCloudinary = async (fileUrls) => {
 
     const deletions = await Promise.all(
       urls.map(async (fileUrl) => {
+        console.log("file urls", fileUrl)
         const { publicId, resourceType } = extractPublicId(fileUrl);
         return cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
       })

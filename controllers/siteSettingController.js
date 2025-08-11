@@ -1,4 +1,4 @@
-import { deleteFromCloudinary } from "../config/cloudinaryService.js";
+import { deleteFromCloudinary, uploadToCloudinary } from "../config/cloudinaryService.js";
 import SiteSetting from "../models/siteSettingModel.js";
 
 export const getSiteSetting = async (req, res) => {
@@ -23,7 +23,7 @@ export const updateSiteSetting = async (req, res) => {
       twitter,
       linkedin,
       iframe,
-      address
+      address,
     } = req.body;
 
     const data = {
@@ -37,21 +37,36 @@ export const updateSiteSetting = async (req, res) => {
       iframe,
       address
     };
+
     let siteSetting = await SiteSetting.findOne();
 
-    if(req.file){
-        if(siteSetting.logo){
-            await deleteFromCloudinary(siteSetting.logo);
-        }
-        const foldername = "siteSetting";
-        const file = req.file;
-        const result = await uploadToCloudinary([file], foldername);
-        data.logo = result[0].url;
-        if (!data.logo) {
-          return res.status(400).json({ success: false, message: "Logo upload failed" });
-        }
+    // ✅ Handle logo upload
+    if (req.files?.logo?.length > 0) {
+      if (siteSetting?.logo) {
+        await deleteFromCloudinary(siteSetting.logo);
+      }
+
+      const foldername = "siteSetting";
+      const result = await uploadToCloudinary(req.files.logo, foldername);
+      data.logo = result[0].url;
+
+      if (!data.logo) {
+        return res.status(400).json({ success: false, message: "Logo upload failed" });
+      }
     }
 
+    // ✅ Handle clients upload
+    if (req.files?.clients?.length > 0) {
+      if(siteSetting?.clients?.length > 0){
+        await deleteFromCloudinary(siteSetting.clients);
+      }
+      const foldername = "siteSetting/clients";
+      const uploadedClients = await uploadToCloudinary(req.files.clients, foldername);
+      const clientUrls = uploadedClients.map(file => file.url);
+      data.clients = clientUrls; // Will replace old clients
+    }
+
+    // ✅ Save or update
     if (siteSetting) {
       Object.assign(siteSetting, data);
     } else {

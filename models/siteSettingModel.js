@@ -11,7 +11,12 @@ const SiteSettingSchema = new mongoose.Schema(
     twitter: { type: String },
     linkedin: { type: String },
     address: { type: String },
-    iframe: { type: String }, 
+    iframe: { type: String },
+    clients : [
+      {
+        type : String
+      }
+    ]
   },
   { timestamps: true }
 );
