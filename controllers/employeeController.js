@@ -4,7 +4,7 @@ import employeeModel from "../models/employeeModel.js";
 // create employee 
 export const createEmployee = async (req, res) => {
     try {
-        const { name, description, designation, department, socialLinks={} } = req.body;
+        const { name, description, designation, department, socialLinks=[] } = req.body;
         
         const newEmployee = new employeeModel({
             name,
@@ -15,12 +15,13 @@ export const createEmployee = async (req, res) => {
         })
 
         if(req.file){
-            foldername = "employee";
+            let foldername = "employee";
             const file = req.file;
             const result = await uploadToCloudinary([file], foldername);
             const profilePicture = result[0].url;
             newEmployee.profilePicture = profilePicture || "";
         }
+        await newEmployee.save();
 
         return res.status(201).json({
             message: "Employee created successfully",
@@ -66,9 +67,11 @@ export const getEmployeeById = async (req, res) => {
 export const updateEmployee = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, description, designation, department, socialLinks={} } = req.body;
+        console.log("id", id)
+        const { name, description, designation, department, socialLinks=[] } = req.body;
 
-        const employee = await employeeModel.findById(id);
+        const employee = await employeeModel.findOne({_id: id});
+        console.log("employee", employee)
         if (!employee) {
             return res.status(404).json({ message: "Employee not found" });
         }

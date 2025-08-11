@@ -22,10 +22,12 @@ const EmployeeSchema = new mongoose.Schema({
         type : String,
         trim : true
     },
-    socialLinks : {
-        type : Object,
-        default : {}
-    }
+    socialLinks : [
+        {
+            type : String,
+            trim : true
+        }
+    ]
 })
 
 export default mongoose.model("Employee", EmployeeSchema)
