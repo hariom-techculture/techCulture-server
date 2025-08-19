@@ -18,6 +18,22 @@ const gallerySchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    thumbnail: {
+        type: String,
+        default: ""
+    },
+    duration: {
+        type: Number,
+        default: 0
+    },
+    height: {
+        type: Number,
+        default: 0
+    },
+    width: {
+        type: Number,
+        default: 0
+    },
     date: {
         type: Date,
         default: Date.now
