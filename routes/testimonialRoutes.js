@@ -4,7 +4,7 @@ import {adminAuthorize,authenticateUser} from "../middlewares/authMiddleware.js"
 import {createTestimonial,deleteTestimonial,editTestimonial,getAllTestimonials,getTestimonialById} from "../controllers/testimonialController.js"
 
 const router = express.Router();
-const upload = multer({dest: "/upload"});
+const upload = multer({dest: "uploads/"});
 
 router.post("/",authenticateUser, adminAuthorize, upload.single("file"), createTestimonial);
 router.get("/", getAllTestimonials);
