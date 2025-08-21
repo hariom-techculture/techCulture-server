@@ -22,6 +22,10 @@ const JobApplicationSchema = new mongoose.Schema(
       default: "Applied",
     },
     notes: { type: String },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
   { timestamps: true }
 );

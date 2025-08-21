@@ -30,6 +30,10 @@ const projectSchema = new mongoose.Schema({
     enum: ["ongoing", "completed"],
     default: "ongoing",
   },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 const Project = mongoose.model("Project", projectSchema);

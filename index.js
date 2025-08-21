@@ -34,7 +34,7 @@ app.use("/api/testimonials", testimonialRouter)
 app.use("/api/contacts", contactRouter)
 app.use("/api/projects", projectRouter)
 app.use("/api/services", serviceRouter)
-app.use("/api/jobpost", jobPostRouter);
+app.use("/api/job-posts", jobPostRouter);
 app.use("/api/job-applications", jobApplicationRouter)
 app.use("/api/enquiries", enquiryRouter);
 

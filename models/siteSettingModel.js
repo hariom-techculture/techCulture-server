@@ -5,18 +5,22 @@ const SiteSettingSchema = new mongoose.Schema(
     siteTitle: { type: String, required: true },
     email: { type: String, required: true },
     contactNo: { type: String, required: true },
-    logo: { type: String }, 
+    logo: { type: String },
     facebook: { type: String },
     instagram: { type: String },
     twitter: { type: String },
     linkedin: { type: String },
     address: { type: String },
     iframe: { type: String },
-    clients : [
+    clients: [
       {
-        type : String
-      }
-    ]
+        type: String,
+      },
+    ],
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
   { timestamps: true }
 );

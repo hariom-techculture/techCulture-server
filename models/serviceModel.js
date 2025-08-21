@@ -10,14 +10,15 @@ const serviceSchema = new mongoose.Schema({
   image: {
     type: String,
   },
-  features : [
-    {type: String,
-  }
-  ],
-  category : {
+  features: [{ type: String }],
+  category: {
     type: String,
-    default : "core"
-  }
+    default: "core",
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 const Service = mongoose.model("Service", serviceSchema);

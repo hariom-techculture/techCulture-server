@@ -6,10 +6,10 @@ import {createTestimonial,deleteTestimonial,editTestimonial,getAllTestimonials,g
 const router = express.Router();
 const upload = multer({dest: "uploads/"});
 
-router.post("/",authenticateUser, adminAuthorize, upload.single("file"), createTestimonial);
+router.post("/", upload.single("file"), createTestimonial);
 router.get("/", getAllTestimonials);
 router.get("/:id", getTestimonialById);
-router.delete("/:id", authenticateUser, adminAuthorize, deleteTestimonial);
-router.put("/:id", authenticateUser, adminAuthorize, upload.single("file"), editTestimonial);
+router.delete("/:id", deleteTestimonial);
+router.put("/:id",  upload.single("file"), editTestimonial);
 
 export default router;

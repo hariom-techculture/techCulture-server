@@ -7,10 +7,10 @@ import {createEmployee,deleteEmployee,getAllEmployees,getEmployeeById,updateEmpl
 
 const upload = multer({ dest: 'uploads/' });
 
-router.post("/", authenticateUser, adminAuthorize, upload.single('file'), createEmployee);
+router.post("/", upload.single('file'), createEmployee);
 router.get("/",  getAllEmployees);
-router.get("/:id", authenticateUser, getEmployeeById);
-router.put("/:id", authenticateUser, adminAuthorize, upload.single('file'), updateEmployee);
-router.delete("/:id", authenticateUser, adminAuthorize, deleteEmployee);
+router.get("/:id",  getEmployeeById);
+router.put("/:id", upload.single('file'), updateEmployee);
+router.delete("/:id",  deleteEmployee);
 
 export default router;
