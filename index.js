@@ -14,6 +14,7 @@ import serviceRouter from "./routes/serviceRoutes.js"
 import jobPostRouter from "./routes/jobPostRoutes.js"
 import jobApplicationRouter from "./routes/jobApplication.js"
 import enquiryRouter from "./routes/enquiryRoutes.js"
+import dashboardRouter from "./routes/dashboardRoutes.js"
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -26,6 +27,7 @@ app.get("/", (req, res) => {
   res.send("Welcome to Tech Culture API")
 })
 
+app.use("/api", dashboardRouter) // Dashboard routes
 app.use("/api/users", userRouter)
 app.use("/api/employees", employeeRouter)
 app.use("/api/site-settings", siteSettingRouter)
