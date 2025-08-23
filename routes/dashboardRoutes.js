@@ -8,7 +8,8 @@ import {
     getContactCount,
     getRecentApplications,
     getRecentEnquiries,
-    getActivityStats
+    getActivityStats,
+    getRecentContacts
 } from '../controllers/dashboardController.js';
 
 const router = express.Router();
@@ -27,7 +28,7 @@ router.get(
   adminAuthorize,
   getJobApplicationCount
 );
-router.get("/enquiry/count", authenticateUser, adminAuthorize, getContactCount);
+router.get("/enquiry/count", authenticateUser, adminAuthorize, getEnquiryCount);
 router.get("/contact/count", authenticateUser, adminAuthorize, getContactCount);
 
 // Recent items endpoints
@@ -51,5 +52,7 @@ router.get(
   adminAuthorize,
   getActivityStats
 );
+
+router.get("/contact/recent", authenticateUser, adminAuthorize, getRecentContacts)
 
 export default router;

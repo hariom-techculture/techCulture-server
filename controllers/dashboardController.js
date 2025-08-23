@@ -3,6 +3,7 @@ import JobPost from "../models/jobPostModel.js";
 import JobApplication from "../models/jobApplicationModel.js";
 import Enquiry from "../models/enquiryModel.js";
 import Contact from "../models/contactModel.js";
+import contactModel from "../models/contactModel.js";
 
 // Count endpoints
 export const getUserCount = async (req, res) => {
@@ -44,7 +45,9 @@ export const getJobApplicationCount = async (req, res) => {
 export const getEnquiryCount = async (req, res) => {
   try {
     const count = await Enquiry.countDocuments();
-    res.status(200).json({ count });
+    res.status(200).json({ 
+      message: "Enquiry count fetched successfully",
+      count });
   } catch (error) {
     res.status(500).json({
       message: "Error fetching enquiry count",
@@ -56,7 +59,10 @@ export const getEnquiryCount = async (req, res) => {
 export const getContactCount = async (req, res) => {
   try {
     const count = await Contact.countDocuments();
-    res.status(200).json({ count });
+    res.status(200).json({ 
+      message : "Contact count",
+      count 
+    });
   } catch (error) {
     res.status(500).json({
       message: "Error fetching contact count",
@@ -93,7 +99,7 @@ export const getRecentApplications = async (req, res) => {
 export const getRecentEnquiries = async (req, res) => {
   try {
     const enquiries = await Enquiry.find()
-      .select("subject email message createdAt status")
+      .select("email message createdAt status")
       .sort({ createdAt: -1 })
       .limit(10);
 
@@ -109,6 +115,28 @@ export const getRecentEnquiries = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       message: "Error fetching recent enquiries",
+      error: error.message,
+    });
+  }
+};
+
+export const getRecentContacts = async (req, res) => {
+  try {
+    const contacts = await contactModel.find().sort({createdAt : -1}).limit(10);
+    const formattedContacts = contacts.map((contact) => ({
+      _id: contact._id,
+      name: contact.name,
+      email: contact.email,
+      message: contact.message?.substring(0, 100) + "...",
+      createdAt: contact.createdAt,
+      read: contact.read,
+    }));
+
+    res.status(200).json(formattedContacts);
+
+  } catch (error) {
+    res.status(500).json({
+      message: "Error fetching recent contacts",
       error: error.message,
     });
   }
