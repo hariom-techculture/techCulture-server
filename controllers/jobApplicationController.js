@@ -1,5 +1,7 @@
 import jobApplicationModel from "../models/jobApplicationModel.js";
 import {deleteFromCloudinary,uploadToCloudinary} from "../config/cloudinaryService.js"
+import { sendEmail } from "../config/emailService.js";
+import { ApplicationStatusChangeAdminEmail, ApplicationSubmittedAdminEmail, ApplicationSubmittedUserEmail } from "../utils/jobApplicationEmails.js";
 
 // create 
 export const createJobApplication = async (req, res) => {
@@ -42,6 +44,26 @@ export const createJobApplication = async (req, res) => {
         newJobApplication.resumeUrl = resume[0].url;
 
         await newJobApplication.save();
+
+        const sent = await sendEmail({
+          sendTo: email,
+          subject: "Job Application Received",
+          text: "",
+          html: ApplicationSubmittedUserEmail(name, newJobApplication.jobId, ),
+        });
+
+        const adminsent = await sendEmail({
+          sendTo: process.env.ADMIN_EMAIL,
+          subject: "New Job Application Received",
+          text: `A new job application has been submitted for Job ID: ${newJobApplication.jobId}. Applicant Name: ${name}, Email: ${email}.`,
+          html: ApplicationSubmittedAdminEmail(
+            name,
+            email,
+            newJobApplication._id,
+            newJobApplication.jobId
+          ),
+        });
+
         res.status(201).json({ message: "Job application created successfully", jobApplication: newJobApplication });
         
     } catch (error) {
@@ -68,9 +90,8 @@ export const getAllJobApplications = async (req, res) => {
 // get job application by ID
 export const getJobApplicationById = async (req, res) => {
     try {
-        const { jobId } = req.params;
-
-        const jobApplication = await jobApplicationModel.findOne({ jobId });
+        const { id } = req.params;
+        const jobApplication = await jobApplicationModel.findOne({ _id : id });
         if (!jobApplication) {
             return res.status(404).json({ message: "Job application not found" });
         }
@@ -88,11 +109,10 @@ export const getJobApplicationById = async (req, res) => {
 // get job application by filters
 export const getJobApplicationsByFilters = async (req, res) => {
     try {
-        const { jobId, status } = req.params;
-
+        const { jobId, status } = req.query;
         let filter = {};
-        if (jobId) filter.jobId = jobId;
-        if (status) filter.status = status;
+        if (jobId) filter.jobId = { $regex: jobId, $options: "i" }
+        if (status) filter.status = { $regex: status, $options: "i" };
 
         const jobApplications = await jobApplicationModel.find(filter).sort({ createdAt: -1 });
         res.status(200).json({
@@ -109,10 +129,10 @@ export const getJobApplicationsByFilters = async (req, res) => {
 // edit
 export const editJobApplication = async (req, res) => {
     try {
-        const { jobId } = req.params;
+        const { id } = req.params;
         const updates = req.body;
 
-        const jobApplication = await jobApplicationModel.findOneAndUpdate({ jobId }, updates, { new: true });
+        const jobApplication = await jobApplicationModel.findOneAndUpdate({ _id : id }, updates, { new: true });
         if (!jobApplication) {
             return res.status(404).json({ message: "Job application not found" });
         }

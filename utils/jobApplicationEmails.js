@@ -1,8 +1,7 @@
 // 1. Email to User when Application is Submitted
 const ApplicationSubmittedUserEmail = (
   name,
-  applicationId,
-  applicationTitle
+  applicationId
 ) => {
   return `<!DOCTYPE html>
   <html lang="en">
@@ -65,7 +64,7 @@ const ApplicationSubmittedUserEmail = (
               <h1>Hi ${name}, Application Submitted Successfully!</h1>
           </div>
           <div class="content">
-              <p>Thank you for submitting your application for <strong>${applicationTitle}</strong>.</p>
+              <p>Thank you for submitting your application for <strong>${applicationId}</strong>.</p>
               <p>Your application has been received and is currently under review.</p>
               <div class="application-id">Application ID: ${applicationId}</div>
               <p>You will receive updates on your application status via email. Please keep this Application ID for your records.</p>

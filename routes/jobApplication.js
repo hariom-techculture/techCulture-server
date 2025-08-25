@@ -9,8 +9,13 @@ const upload = multer({ dest: "uploads/" });
 router.post("/", upload.single("file"), createJobApplication);
 router.get("/", authenticateUser, adminAuthorize, getAllJobApplications);
 router.get("/filters", authenticateUser, adminAuthorize, getJobApplicationsByFilters);
-router.get("/:id", getJobApplicationById);
+router.get("/:jobId", getJobApplicationById);
 router.put("/:id", authenticateUser, adminAuthorize, editJobApplication);
-router.delete("/:id", authenticateUser, adminAuthorize, deleteJobApplication);
+router.delete(
+  "/:id",
+  authenticateUser,
+  adminAuthorize,
+  deleteJobApplication
+);
 
 export default router;
