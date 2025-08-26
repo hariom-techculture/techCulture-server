@@ -17,9 +17,9 @@ jobs:
           key: ${{ secrets.DO_SSH_KEY }}
           script: |
             set -e
-            cd /server
+            cd /root/server
             git fetch --all
-            git reset --hard origin/main
+            git reset --hard origin/master
             npm ci
             pm2 restart server || pm2 start npm --name server -- run start
             pm2 save
