@@ -22,8 +22,10 @@ export const updateSiteSetting = async (req, res) => {
       instagram,
       twitter,
       linkedin,
-      iframe,
-      address,
+      registeredIframe,
+      officeIframe,
+      registeredAddress,
+      officeAddress,
     } = req.body;
 
     const data = {
@@ -34,8 +36,10 @@ export const updateSiteSetting = async (req, res) => {
       instagram,
       twitter,
       linkedin,
-      iframe,
-      address
+      registeredIframe,
+      officeIframe,
+      registeredAddress,
+      officeAddress,
     };
 
     let siteSetting = await SiteSetting.findOne();

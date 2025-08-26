@@ -6,7 +6,7 @@ import {adminloginUser,changePassword,forgotPassword, getAllUsers, getUserProfil
 
 const upload = multer({ dest: 'uploads/' })
 
-router.post("/register", registerUser);
+router.post("/register",authenticateUser, adminAuthorize, registerUser);
 router.post("/login", adminloginUser);
 router.post("/verify-otp", verifyOtp);
 router.post("/forgot-password", forgotPassword);

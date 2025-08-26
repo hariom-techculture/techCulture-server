@@ -10,8 +10,10 @@ const SiteSettingSchema = new mongoose.Schema(
     instagram: { type: String },
     twitter: { type: String },
     linkedin: { type: String },
-    address: { type: String },
-    iframe: { type: String },
+    registeredAddress: { type: String },
+    officeAddress: { type: String },
+    registeredIframe: { type: String },
+    officeIframe: { type: String },
     clients: [
       {
         type: String,
