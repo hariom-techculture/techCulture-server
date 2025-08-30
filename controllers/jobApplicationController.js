@@ -1,5 +1,10 @@
-import jobApplicationModel from "../models/jobApplicationModel.js";
+import JobApplication from "../models/jobApplicationModel.js";
+import JobPost from "../models/jobPostModel.js";
 import {deleteFromCloudinary,uploadToCloudinary} from "../config/cloudinaryService.js"
+import { cleanupTempFiles } from "../utils/fileCleanup.js";
+import { v4 as uuidv4 } from 'uuid';
+import Employee from "../models/employeeModel.js";
+const jobApplicationModel = JobApplication;
 import { sendEmail } from "../config/emailService.js";
 import { ApplicationStatusChangeAdminEmail, ApplicationSubmittedAdminEmail, ApplicationSubmittedUserEmail } from "../utils/jobApplicationEmails.js";
 
@@ -9,6 +14,10 @@ export const createJobApplication = async (req, res) => {
         const { jobId, name, email, phone, coverLetter, portfolioUrl, additionalInfo="" } = req.body;
 
         if (!jobId || !name || !email || !phone) {
+          // Clean up temp file if validation fails
+          if (req.file) {
+            cleanupTempFiles([req.file]);
+          }
           return res
             .status(400)
             .json({ message: "Please provide all required fields" });
@@ -24,6 +33,8 @@ export const createJobApplication = async (req, res) => {
           email,
         });
         if (existingApplication) {
+            // Clean up temp file if application already exists
+            cleanupTempFiles([req.file]);
             return res.status(400).json({ message: "You have already applied for this job" });
         }
 
@@ -36,9 +47,11 @@ export const createJobApplication = async (req, res) => {
           portfolioUrl,
           additionalInfo,
         });
+        
         let folder = "jobApplications";
         let resume = await uploadToCloudinary([req.file],folder);
         if (!resume) {
+            // Cleanup will be handled by uploadToCloudinary error handler
             return res.status(500).json({ message: "Failed to upload resume" });
         }
         newJobApplication.resumeUrl = resume[0].url;
@@ -67,6 +80,10 @@ export const createJobApplication = async (req, res) => {
         res.status(201).json({ message: "Job application created successfully", jobApplication: newJobApplication });
         
     } catch (error) {
+        // Clean up temp file if error occurs during processing
+        if (req.file) {
+            cleanupTempFiles([req.file]);
+        }
         console.error("Error creating job application:", error);
         res.status(500).json({ message: "Internal server error" });
     }

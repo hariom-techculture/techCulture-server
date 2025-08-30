@@ -1,4 +1,5 @@
 import { deleteFromCloudinary, uploadToCloudinary } from "../config/cloudinaryService.js";
+import { cleanupTempFiles } from "../utils/fileCleanup.js";
 import employeeModel from "../models/employeeModel.js";
 
 // create employee 
@@ -28,6 +29,10 @@ export const createEmployee = async (req, res) => {
             employee: newEmployee
         });
     } catch (error) {
+        // Clean up temp file if error occurs during processing
+        if (req.file) {
+            cleanupTempFiles([req.file]);
+        }
         return res.status(500).json({ message: error.message });
     }
 }
@@ -99,6 +104,10 @@ export const updateEmployee = async (req, res) => {
             employee
         });
     } catch (error) {
+        // Clean up temp file if error occurs during processing
+        if (req.file) {
+            cleanupTempFiles([req.file]);
+        }
         return res.status(500).json({ message: error.message });
     }
 }

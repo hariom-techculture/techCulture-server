@@ -1,5 +1,6 @@
 import Service from "../models/serviceModel.js";
 import {deleteFromCloudinary,uploadToCloudinary} from "../config/cloudinaryService.js"
+import { cleanupTempFiles } from "../utils/fileCleanup.js";
 
 //create 
 export const createService = async (req, res) => {
@@ -31,6 +32,10 @@ export const createService = async (req, res) => {
     })
     
   } catch (error) {
+    // Clean up temp file if error occurs during processing
+    if (req.file) {
+        cleanupTempFiles([req.file]);
+    }
     res.status(400).json({ error: error.message });
   }
 };
@@ -96,6 +101,10 @@ export const updateService = async (req, res) => {
     });
     }
     catch (error) {
+        // Clean up temp file if error occurs during processing
+        if (req.file) {
+            cleanupTempFiles([req.file]);
+        }
         res.status(400).json({ error: error.message });
     }
 }

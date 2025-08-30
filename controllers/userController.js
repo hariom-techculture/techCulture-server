@@ -5,6 +5,7 @@ import {sendEmail} from "../config/emailService.js"
 import VerificationEmail from "../utils/verifyEmail.js";
 import forgotPasswordEmail from "../utils/forgotPasswordEmail.js";
 import { deleteFromCloudinary, uploadToCloudinary } from "../config/cloudinaryService.js";
+import { cleanupTempFiles } from "../utils/fileCleanup.js";
 
 
 //  Register User 
@@ -171,6 +172,10 @@ export const updateUserProfile = async (req, res) => {
             }
         });
     } catch (error) {
+        // Clean up temp file if error occurs during processing
+        if (req.file) {
+            cleanupTempFiles([req.file]);
+        }
         return res.status(500).json({ message: error.message });
     }
 }

@@ -1,4 +1,5 @@
 import { deleteFromCloudinary, uploadToCloudinary } from "../config/cloudinaryService.js";
+import { cleanupTempFiles } from "../utils/fileCleanup.js";
 import galleryModel from "../models/galleryModel.js";
 
 import { v2 as cloudinary } from "cloudinary";
@@ -81,6 +82,10 @@ export const createGalleryController = async (req, res) => {
       gallery: newGallery,
     });
   } catch (error) {
+    // Clean up temp file if error occurs during processing
+    if (req.file) {
+      cleanupTempFiles([req.file]);
+    }
     res.status(500).json({
       success: false,
       message: error.message,
@@ -185,6 +190,10 @@ export const updateGalleryImage = async (req, res) => {
             gallery
         });
     } catch (error) {
+        // Clean up temp file if error occurs during processing
+        if (req.file) {
+            cleanupTempFiles([req.file]);
+        }
         return res.status(500).json({ message: error.message });
     }
 }

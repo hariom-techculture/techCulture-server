@@ -5,6 +5,7 @@ import { v2 as cloudinary} from "cloudinary";
 import path, { format } from "path";
 import url from "url";
 import { v4 as uuidv4 } from 'uuid'; 
+import { cleanupTempFiles } from '../utils/fileCleanup.js'; 
 
 // Configure Cloudinary
 cloudinary.config({
@@ -23,9 +24,12 @@ const sanitizeFileName = (name) => {
 
 // Upload single or multiple files
 const uploadToCloudinary = async (files, folder = 'default') => {
-
+  let tempFiles = [];
+  
   try {
     if (!files || files.length === 0) throw new Error('No files provided');
+
+    tempFiles = [...files]; // Keep reference for cleanup
 
     const uploads = await Promise.all(
       files.map(async (file) => {
@@ -44,13 +48,22 @@ const uploadToCloudinary = async (files, folder = 'default') => {
         format: resourceType == "raw" ? "pdf" : undefined
       };
 
-      const result = await cloudinary.uploader.upload(file.path ,cloudinaryOptions);
-      fs.unlinkSync(file.path);
+      const result = await cloudinary.uploader.upload(file.path, cloudinaryOptions);
+      
+      // Clean up individual file after successful upload
+      if (fs.existsSync(file.path)) {
+        fs.unlinkSync(file.path);
+        console.log(`✅ Cleaned up temp file: ${file.path}`);
+      }
+      
       return result;
     }))
 
     return uploads;
   } catch (error) {
+    // Ensure cleanup even if upload fails
+    console.error('❌ Upload failed, cleaning up temp files');
+    cleanupTempFiles(tempFiles);
     throw new Error(`Cloudinary Upload Error: ${error.message}`);
   }
 };

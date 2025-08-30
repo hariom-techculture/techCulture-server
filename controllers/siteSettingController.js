@@ -1,4 +1,5 @@
 import { deleteFromCloudinary, uploadToCloudinary } from "../config/cloudinaryService.js";
+import { cleanupTempFiles } from "../utils/fileCleanup.js";
 import SiteSetting from "../models/siteSettingModel.js";
 
 export const getSiteSetting = async (req, res) => {
@@ -80,6 +81,13 @@ export const updateSiteSetting = async (req, res) => {
     await siteSetting.save();
     res.status(200).json({ success: true, data: siteSetting });
   } catch (error) {
+    // Clean up temp files if error occurs during processing
+    if (req.files) {
+      const allFiles = [];
+      if (req.files.logo) allFiles.push(...req.files.logo);
+      if (req.files.clients) allFiles.push(...req.files.clients);
+      cleanupTempFiles(allFiles);
+    }
     console.error("Error updating site setting:", error);
     res
       .status(500)

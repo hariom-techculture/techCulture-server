@@ -1,4 +1,5 @@
 import { deleteFromCloudinary, uploadToCloudinary } from "../config/cloudinaryService.js";
+import { cleanupTempFiles } from "../utils/fileCleanup.js";
 import Testimonial from "../models/testimonialModel.js";
 
 
@@ -29,6 +30,10 @@ export const createTestimonial = async (req, res) => {
         });
 
     } catch (error) {
+        // Clean up temp file if error occurs during processing
+        if (req.file) {
+            cleanupTempFiles([req.file]);
+        }
         res.status(500).json({ error: error.message });
     }
 };
@@ -121,6 +126,10 @@ export const editTestimonial = async (req, res) => {
             testimonial
         });
     } catch (error) {
+        // Clean up temp file if error occurs during processing
+        if (req.file) {
+            cleanupTempFiles([req.file]);
+        }
         return res.status(500).json({ message: error.message });
     }
 }

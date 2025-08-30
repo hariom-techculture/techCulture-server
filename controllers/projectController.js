@@ -1,5 +1,6 @@
 import Project from "../models/projectModel.js";
 import {deleteFromCloudinary,uploadToCloudinary} from "../config/cloudinaryService.js"
+import { cleanupTempFiles } from "../utils/fileCleanup.js";
 // create
 export const createProject = async (req, res) => {
     try{
@@ -28,6 +29,10 @@ export const createProject = async (req, res) => {
         res.status(201).json({message: "Project created successfully", project: savedProject});
     }
     catch(err){
+        // Clean up temp file if error occurs during processing
+        if (req.file) {
+            cleanupTempFiles([req.file]);
+        }
         res.status(500).json({message: err.message});
     }
 }
@@ -88,6 +93,10 @@ export const updateProject = async (req, res) => {
         res.status(200).json({message: "Project updated successfully", project: updatedProject});
     }
     catch(err){
+        // Clean up temp file if error occurs during processing
+        if (req.file) {
+            cleanupTempFiles([req.file]);
+        }
         res.status(500).json({message: err.message});
     }
 }
