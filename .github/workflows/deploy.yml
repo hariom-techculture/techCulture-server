@@ -17,7 +17,7 @@ jobs:
           key: ${{ secrets.DO_SSH_KEY }}
           script: |
             set -e
-            cd /root/server
+            cd /var/www/server
             git fetch --all
             git reset --hard origin/master
             pnpm install --frozen-lockfile
