@@ -1,5 +1,7 @@
-import { deleteFromCloudinary, uploadToCloudinary } from "../config/cloudinaryService.js";
-import { cleanupTempFiles } from "../utils/fileCleanup.js";
+import {
+  deleteFromCloudinary,
+  uploadToCloudinary,
+} from "../config/cloudinaryService.js";
 import SiteSetting from "../models/siteSettingModel.js";
 
 export const getSiteSetting = async (req, res) => {
@@ -56,19 +58,32 @@ export const updateSiteSetting = async (req, res) => {
       data.logo = result[0].url;
 
       if (!data.logo) {
-        return res.status(400).json({ success: false, message: "Logo upload failed" });
+        return res
+          .status(400)
+          .json({ success: false, message: "Logo upload failed" });
       }
     }
 
     // ✅ Handle clients upload
     if (req.files?.clients?.length > 0) {
-      if(siteSetting?.clients?.length > 0){
-        await deleteFromCloudinary(siteSetting.clients);
-      }
       const foldername = "siteSetting/clients";
-      const uploadedClients = await uploadToCloudinary(req.files.clients, foldername);
-      const clientUrls = uploadedClients.map(file => file.url);
-      data.clients = clientUrls; // Will replace old clients
+      const uploadedClients = await uploadToCloudinary(
+        req.files.clients,
+        foldername
+      );
+      const newClientUrls = uploadedClients.map((file) => file.url);
+
+      // Merge with existing clients if existingClients is provided
+      let existingClientUrls = [];
+      if (req.body.existingClients) {
+        try {
+          existingClientUrls = JSON.parse(req.body.existingClients);
+        } catch (e) {
+          console.log("Error parsing existingClients:", e);
+        }
+      }
+
+      data.clients = [...existingClientUrls, ...newClientUrls];
     }
 
     // ✅ Save or update
@@ -81,13 +96,6 @@ export const updateSiteSetting = async (req, res) => {
     await siteSetting.save();
     res.status(200).json({ success: true, data: siteSetting });
   } catch (error) {
-    // Clean up temp files if error occurs during processing
-    if (req.files) {
-      const allFiles = [];
-      if (req.files.logo) allFiles.push(...req.files.logo);
-      if (req.files.clients) allFiles.push(...req.files.clients);
-      cleanupTempFiles(allFiles);
-    }
     console.error("Error updating site setting:", error);
     res
       .status(500)
