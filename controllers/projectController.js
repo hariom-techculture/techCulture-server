@@ -9,13 +9,13 @@ export const createProject = async (req, res) => {
         if(!title || !description || !category){
             return res.status(400).json({message: "Please fill all the fields"});
         }
-
+        const parsedTechnologies = technologies ? JSON.parse(technologies) : [];
         const newProject = new Project({
             title,
             description,
             category,
             location,
-            technologies,
+            technologies: parsedTechnologies,
             status,
         });
 
@@ -86,7 +86,7 @@ export const updateProject = async (req, res) => {
         project.description = description;
         project.category = category;
         project.location = location;
-        project.technologies = technologies;
+        project.technologies = JSON.parse(technologies) ;
         project.status = status;
 
         const updatedProject = await project.save();
